@@ -1,96 +1,177 @@
-#include <GL/glew.h>
+Ôªø#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <string>
+#include <fstream>
 
+using namespace std;
 
 int			window_width = 600;
 int			window_height = 600;
 char		window_title[] = "Hello OpenGL!";
 GLFWwindow* window = nullptr;
 
+float vertices[6] = {
+	-0.5,-0.5,
+	0.0,0.5,
+	0.5,-0.5
+};
 
-/** Az alkalmaz·shoz kapcsolÛdÛ elıkÈszÌtı lÈpÈsek, pl. a shader objektumok lÈtrehoz·sa. */
+std::string readShaderSource(const char* filePath) {
+	string content;
+	ifstream fileStream(filePath, ios::in);
+	string line = "";
+
+	while (!fileStream.eof()) {
+		getline(fileStream, line);
+		content.append(line + "\n");
+	}
+	fileStream.close();
+	return content;
+}
+
+static unsigned int CompileShader(const string& sourceShader,unsigned int type) {
+	unsigned int id = glCreateShader(type);
+	const char* src = &sourceShader[0];
+	glShaderSource(id, 1, &src, NULL);
+	glCompileShader(id);
+
+	// Error check
+	int result;
+	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE) {
+		int lenght;
+		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &lenght);
+		glDeleteShader(id);
+		return 0;
+	}
+	return id;
+}
+
+static unsigned int CreateShader(const string& vertexShader, const string& fragmentShader) {
+	unsigned int program = glCreateProgram();
+	
+	unsigned int vertex = CompileShader(vertexShader, GL_VERTEX_SHADER);
+	unsigned int fragment = CompileShader(fragmentShader, GL_FRAGMENT_SHADER);
+
+	glAttachShader(program, vertex);
+	glAttachShader(program, fragment);
+
+	glLinkProgram(program);
+	glValidateProgram(program);
+
+	glDeleteShader(vertex);
+	glDeleteShader(fragment);
+
+	return program;
+}
+
+
+
+/** Az alkalmaz√°shoz kapcsol√≥d√≥ el√µk√©sz√≠t√µ l√©p√©sek, pl. a shader objektumok l√©trehoz√°sa. */
 /** The first initialization steps of the program, e.g.: creating the shader objects. */
 void init() {
-	/** TˆrlÈsi szÌn be·llÌt·sa pirosra 1.0 ·ttetszısÈg mellett. (red, green, blue, alpha) [0.0, 1.0] */
+	/** T√∂rl√©si sz√≠n be√°ll√≠t√°sa pirosra 1.0 √°ttetsz√µs√©g mellett. (red, green, blue, alpha) [0.0, 1.0] */
 	/** Set the clearing color for red at 1.0 transparency. (red, green, blue, alpha) [0.0, 1.0] */
-	glClearColor(1.0, 0.0, 0.0, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	// Create the VAO Vertex Array Object
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO); // Gener√°ljuk le a hogy vertex array amit kit≈±z≈±nk
+	glBindVertexArray(VAO); // Le kell bindolni
+
+	// VBO Vertex Buffer Object Mem foglal√°s
+	unsigned int VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+	glEnableVertexAttribArray(0);
+
+	string vertexShaderSource = readShaderSource("vertexShader.glsl");
+	string fragmentShaderSource = readShaderSource("fragmentShader.glsl");
+
+
+	unsigned int shader = CreateShader(vertexShaderSource,fragmentShaderSource);
+	glUseProgram(shader);
+
 }
 
-/** A kÛd, amellyel rajzolni tudunk a GLFWwindow objektumunkba. */
+/** A k√≥d, amellyel rajzolni tudunk a GLFWwindow objektumunkba. */
 /** Call display function which will draw into the GLFWwindow object. */
 void display() {
-	/** Tˆrˆlj¸k le a szÌnbuffert! */
+	/** T√∂r√∂lj√ºk le a sz√≠nbuffert! */
 	/** Let's clear the color buffer! */
 	glClear(GL_COLOR_BUFFER_BIT);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-/** Felesleges objektumok tˆrlÈse. */
+/** Felesleges objektumok t√∂rl√©se. */
 /** Clenup the unnecessary objects. */
 void cleanUpScene() {
-	/** Tˆrˆlj¸k a GLFW ablakot. */
+	/** T√∂r√∂lj√ºk a GLFW ablakot. */
 	/** Destroy the GLFW window. */
 	glfwDestroyWindow(window);
-	/** Le·llÌtjuk a GLFW-t. */
+	/** Le√°ll√≠tjuk a GLFW-t. */
 	/** Stop the GLFW system. */
 	glfwTerminate();
-	/** KilÈpÈs EXIT_SUCCESS kÛddal. */
+	/** Kil√©p√©s EXIT_SUCCESS k√≥ddal. */
 	/** Stop the software and exit with EXIT_SUCCESS code. */
 	exit(EXIT_SUCCESS);
 }
 
 int main(void) {
-	/** PrÛb·ljuk meg inicializ·lni a GLFW-t! */
+	/** Pr√≥b√°ljuk meg inicializ√°lni a GLFW-t! */
 	/** Try to initialize GLFW! */
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
 
-	/** A haszn·lni kÌv·nt OpenGL verziÛ: 4.3. */
+	/** A haszn√°lni k√≠v√°nt OpenGL verzi√≥: 4.3. */
 	/** The needed OpenGL version: 4.3. */
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	//	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make macOS happy; should not be needed.
 
-		/** PrÛb·ljuk meg lÈtrehozni az ablakunkat. */
+		/** Pr√≥b√°ljuk meg l√©trehozni az ablakunkat. */
 		/** Let's try to create a window for drawing. */
 		/** GLFWwindow* glfwCreateWindow(int width, int height, const char* title, GLFWmonitor * monitor, GLFWwindow * share) */
 	window = glfwCreateWindow(window_width, window_height, window_title, nullptr, nullptr);
 
-	/** V·lasszuk ki az ablakunk OpenGL kontextus·t, hogy haszn·lhassuk. */
+	/** V√°lasszuk ki az ablakunk OpenGL kontextus√°t, hogy haszn√°lhassuk. */
 	/** Select the OpenGL context (window) for drawing. */
 	glfwMakeContextCurrent(window);
 
-	/** Incializ·ljuk a GLEW-t, hogy elÈrhetıvÈ v·ljanak az OpenGL f¸ggvÈnyek, problÈma esetÈn kilÈpÈs EXIT_FAILURE ÈrtÈkkel. */
+	/** Incializ√°ljuk a GLEW-t, hogy el√©rhet√µv√© v√°ljanak az OpenGL f√ºggv√©nyek, probl√©ma eset√©n kil√©p√©s EXIT_FAILURE √©rt√©kkel. */
 	/** Initalize GLEW, so the OpenGL functions will be available, on problem exit with EXIT_FAILURE code. */
 	if (glewInit() != GLEW_OK)
 		exit(EXIT_FAILURE);
 
-	/** 0 = v-sync kikapcsolva, 1 = v-sync bekapcsolva, n = n db kÈpkock·nyi idıt v·rakozunk */
+	/** 0 = v-sync kikapcsolva, 1 = v-sync bekapcsolva, n = n db k√©pkock√°nyi id√µt v√°rakozunk */
 	/** 0 = v-sync off, 1 = v-sync on, n = n pieces frame time waiting */
 	glfwSwapInterval(1);
-	/** Az alkalmaz·shoz kapcsolÛdÛ elıkÈszÌtı lÈpÈsek, pl. a shader objektumok lÈtrehoz·sa. */
+	/** Az alkalmaz√°shoz kapcsol√≥d√≥ el√µk√©sz√≠t√µ l√©p√©sek, pl. a shader objektumok l√©trehoz√°sa. */
 	/** The first initialization steps of the program, e.g.: creating the shader objects. */
 	init();
 
-	/** A megadott window strukt˙ra "close flag" vizsg·lata. */
+	/** A megadott window strukt√∫ra "close flag" vizsg√°lata. */
 	/** Checks the "close flag" of the specified window. */
 	while (!glfwWindowShouldClose(window)) {
-		/** A kÛd, amellyel rajzolni tudunk a GLFWwindow objektumunkba. */
+		/** A k√≥d, amellyel rajzolni tudunk a GLFWwindow objektumunkba. */
 		/** Call display function which will draw into the GLFWwindow object. */
 		display();
-		/** Double buffered m˚kˆdÈs. */
+		/** Double buffered m√ªk√∂d√©s. */
 		/** Double buffered working = swap the front and back buffer here. */
 		glfwSwapBuffers(window);
-		/** EsemÈnyek kezelÈse az ablakunkkal kapcsolatban, pl. gombnyom·s. */
+		/** Esem√©nyek kezel√©se az ablakunkkal kapcsolatban, pl. gombnyom√°s. */
 		/** Handle events related to our window, e.g.: pressing a key or moving the mouse. */
 		glfwPollEvents();
 	}
 
-	/** Felesleges objektumok tˆrlÈse. */
+	/** Felesleges objektumok t√∂rl√©se. */
 	/** Clenup the unnecessary objects. */
 	cleanUpScene();
 
-	/** KilÈpÈs EXIT_SUCCESS kÛddal. */
+	/** Kil√©p√©s EXIT_SUCCESS k√≥ddal. */
 	/** Stop the software and exit with EXIT_SUCCESS code. */
 	return EXIT_SUCCESS;
 }
