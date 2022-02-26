@@ -27,4 +27,12 @@
       <Filter>Source Files</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\Zsolti\Desktop\1FELADAT_Gazdik Máté_J24NE0\fragmentLine.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="C:\Users\Zsolti\Desktop\1FELADAT_Gazdik Máté_J24NE0\vertexLine.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

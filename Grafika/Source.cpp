@@ -30,7 +30,7 @@ std::string readShaderSource(const char* filePath) {
 	return content;
 }
 
-static unsigned int CompileShader(const string& sourceShader,unsigned int type) {
+static unsigned int CompileShader(const string& sourceShader, unsigned int type) {
 	unsigned int id = glCreateShader(type);
 	const char* src = &sourceShader[0];
 	glShaderSource(id, 1, &src, NULL);
@@ -50,7 +50,7 @@ static unsigned int CompileShader(const string& sourceShader,unsigned int type) 
 
 static unsigned int CreateShader(const string& vertexShader, const string& fragmentShader) {
 	unsigned int program = glCreateProgram();
-	
+
 	unsigned int vertex = CompileShader(vertexShader, GL_VERTEX_SHADER);
 	unsigned int fragment = CompileShader(fragmentShader, GL_FRAGMENT_SHADER);
 
@@ -92,7 +92,7 @@ void init() {
 	string fragmentShaderSource = readShaderSource("fragmentShader.glsl");
 
 
-	unsigned int shader = CreateShader(vertexShaderSource,fragmentShaderSource);
+	unsigned int shader = CreateShader(vertexShaderSource, fragmentShaderSource);
 	glUseProgram(shader);
 
 }
