@@ -8,13 +8,12 @@ using namespace std;
 
 int			window_width = 600;
 int			window_height = 600;
-char		window_title[] = "Hello OpenGL!";
+char		window_title[] = "Beadando 1.";
 GLFWwindow* window = nullptr;
 
-float vertices[6] = {
-	-0.5,-0.5,
-	0.0,0.5,
-	0.5,-0.5
+float verticesLine[] = {
+	-1.0,0.0,
+	1.0,0.0
 };
 
 std::string readShaderSource(const char* filePath) {
@@ -73,7 +72,8 @@ static unsigned int CreateShader(const string& vertexShader, const string& fragm
 void init() {
 	/** Törlési szín beállítása pirosra 1.0 áttetszõség mellett. (red, green, blue, alpha) [0.0, 1.0] */
 	/** Set the clearing color for red at 1.0 transparency. (red, green, blue, alpha) [0.0, 1.0] */
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClearColor(1, 1, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Create the VAO Vertex Array Object
 	unsigned int VAO;
@@ -84,17 +84,16 @@ void init() {
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesLine), verticesLine, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 	glEnableVertexAttribArray(0);
 
-	string vertexShaderSource = readShaderSource("vertexShader.glsl");
-	string fragmentShaderSource = readShaderSource("fragmentShader.glsl");
+	string vertexShaderSource = readShaderSource("vertexShaderLine.glsl");
+	string fragmentShaderSource = readShaderSource("fragmentShaderLine.glsl");
 
 
 	unsigned int shader = CreateShader(vertexShaderSource, fragmentShaderSource);
 	glUseProgram(shader);
-
 }
 
 /** A kód, amellyel rajzolni tudunk a GLFWwindow objektumunkba. */
@@ -103,7 +102,8 @@ void display() {
 	/** Töröljük le a színbuffert! */
 	/** Let's clear the color buffer! */
 	glClear(GL_COLOR_BUFFER_BIT);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glLineWidth(3);
+	glDrawArrays(GL_LINE_LOOP, 0, 2);
 }
 
 /** Felesleges objektumok törlése. */

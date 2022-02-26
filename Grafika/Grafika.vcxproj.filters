@@ -20,10 +20,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="fragmentShader.glsl">
+    <Text Include="fragmentShaderLine.glsl">
       <Filter>Source Files</Filter>
     </Text>
-    <Text Include="vertexShader.glsl">
+    <Text Include="vertexShaderLine.glsl">
       <Filter>Source Files</Filter>
     </Text>
   </ItemGroup>
