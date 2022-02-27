@@ -9,6 +9,7 @@
 #include <fstream>
 #include <vector>
 #include <time.h>
+#include <cmath>
 #define numVBO 4
 #define numVAO 2
 using namespace std;
@@ -24,14 +25,26 @@ unsigned int VBO[numVBO];
 unsigned int shaderLineProgram;
 unsigned int shaderCircleProgram;
 
+GLuint		renderingProgram;
+GLuint		XoffsetLocation;
+GLuint		YoffsetLocation;
+
+float		x = 0.00f;
+float		y = 0.00f;
+float		increment = 0.01f;
+
+bool		xDir = true;
+bool		yDir = false;
+
+
 float verticesLine[] = {
-	-0.33,0.0,
-	0.33,0.0
+	-0.33,0.0,0.0,
+	0.33,0.0,0.0
 };
 
 float LineColor[] = {
-	0,0,0,
-	0,0,0
+	0,0,1,0,
+	0,0,1,0
 };
 
 std::vector<glm::vec3> verticesCircle;
@@ -42,12 +55,12 @@ void DrawCircle()
 	for (int i = 0; i <= 360; i++)
 	{
 		float theta = 2.0f * 3.1415926f * float(i) / float(360);
-		float x = 0.5 * cosf(theta);
-		float y = 0.5 * sinf(theta);
+		float x = 0.16 * cosf(theta);
+		float y = 0.16 * sinf(theta);
 		float z = 0.0f;
 		if (i % 2 == 0) {
 			verticesCircle.push_back(glm::vec3(x, y, z));
-			CircleColor.push_back(glm::vec3(0.0, 1.0, 0.0));
+			CircleColor.push_back(glm::vec3(0.0, 0.4, 0.0));
 		}
 		else {
 			verticesCircle.push_back(glm::vec3(0, 0, 0));
@@ -116,6 +129,32 @@ void init() {
 	glGenBuffers(numVBO, VBO);
 	glGenVertexArrays(numVAO, VAO);
 
+
+	// Line
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesLine), verticesLine, GL_STATIC_DRAW);
+	glBindVertexArray(VAO[1]);
+	
+
+	
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	/* Engedélyezzük az imént definiált location = 0 attribútumot (vertexShader.glsl). */
+	/* Enable the previously defined location = 0 attributum (vertexShader.glsl). */
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(LineColor), LineColor, GL_STATIC_DRAW);
+	glBindVertexArray(VAO[1]);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	/* Leválasztjuk a vertex array objektumot és a buffert is. */
+	/* Detach the vertex array object and the buffer also. */
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
 	// Circle
 	DrawCircle();
 
@@ -125,6 +164,7 @@ void init() {
 	glBufferData(GL_ARRAY_BUFFER, verticesCircle.size() * sizeof(glm::vec3), verticesCircle.data(), GL_STATIC_DRAW);
 	glBindVertexArray(VAO[0]);
 
+	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 	glGenBuffers(1, &VBO[1]);
@@ -132,37 +172,12 @@ void init() {
 
 	glBufferData(GL_ARRAY_BUFFER, CircleColor.size() * sizeof(glm::vec3), CircleColor.data(), GL_STATIC_DRAW);
 
+	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 	/* Engedélyezzük az imént definiált location = 0 attribútumot (vertexShader.glsl). */
 	/* Enable the previously defined location = 0 attributum (vertexShader.glsl). */
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	/* Leválasztjuk a vertex array objektumot és a buffert is. */
-	/* Detach the vertex array object and the buffer also. */
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-
-
-	// Line
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesLine), verticesLine, GL_STATIC_DRAW);
-	glBindVertexArray(VAO[1]);
-	
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-
-	//glGenBuffers(1, &VBO[3]);
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
-
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(LineColor), LineColor, GL_STATIC_DRAW);
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-	/* Engedélyezzük az imént definiált location = 0 attribútumot (vertexShader.glsl). */
-	/* Enable the previously defined location = 0 attributum (vertexShader.glsl). */
-	glEnableVertexAttribArray(0);
-	//glEnableVertexAttribArray(1);
 
 	/* Leválasztjuk a vertex array objektumot és a buffert is. */
 	/* Detach the vertex array object and the buffer also. */
@@ -188,22 +203,23 @@ void init() {
 void display() {
 	/** Töröljük le a színbuffert! */
 	/** Let's clear the color buffer! */
-	glClearColor(1, 1, 0.0, 1.0);
+	glClearColor(0.5, 0.5, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Line
+	glBindVertexArray(VAO[1]);
+	glLineWidth(3);
+	glDrawArrays(GL_LINE_LOOP, 0, sizeof(verticesLine) / sizeof(verticesLine[0]));
+
+	// Leválasztom
+	glBindVertexArray(0);
+
 
 	// Circle
 
 	glBindVertexArray(VAO[0]);
 	//glDrawArrays(GL_LINE_LOOP, 0, verticesCircle.size());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, verticesCircle.size());
-	glBindVertexArray(0);
-
-	// Line
-	glBindVertexArray(VAO[1]);
-	glLineWidth(3);
-	glDrawArrays(GL_LINE_LOOP, 0, 2);
-
-	// Leválasztom
 	glBindVertexArray(0);
 
 
