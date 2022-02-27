@@ -151,6 +151,10 @@
     <Text Include="fragmentShaderLine.glsl" />
     <Text Include="vertexShaderLine.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="fragmentShaderCircle.glsl" />
+    <None Include="vertexShaderCircle.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

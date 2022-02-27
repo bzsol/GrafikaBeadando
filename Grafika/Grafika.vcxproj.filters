@@ -27,4 +27,12 @@
       <Filter>Source Files</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="vertexShaderCircle.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="fragmentShaderCircle.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
