@@ -60,7 +60,7 @@ void DrawCircle()
 		float z = 0.0f;
 		if (i % 2 == 0) {
 			verticesCircle.push_back(glm::vec3(x, y, z));
-			CircleColor.push_back(glm::vec3(0.0, 0.4, 0.0));
+			CircleColor.push_back(glm::vec3(0.0, 1.0, 0.0));
 		}
 		else {
 			verticesCircle.push_back(glm::vec3(0, 0, 0));
@@ -203,8 +203,10 @@ void init() {
 void display() {
 	/** Töröljük le a színbuffert! */
 	/** Let's clear the color buffer! */
-	glClearColor(0.5, 0.5, 0.0, 1.0);
+	glClearColor(1, 1, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+
 
 	// Line
 	glBindVertexArray(VAO[1]);
@@ -214,14 +216,27 @@ void display() {
 	// Leválasztom
 	glBindVertexArray(0);
 
+	if (xDir) {
+		x += increment;
+		if (x > 0.84f) increment = -0.01f;
+		if (x < -0.84f) increment = 0.01f;
+		unsigned int offsetLoc = glGetUniformLocation(shaderCircleProgram, "offsetX");
+		glProgramUniform1f(shaderCircleProgram, offsetLoc, x);
+	}
+	if (yDir) {
+		y += increment;
+		if (y > 0.84f) increment = -0.01f;
+		if (y < -0.84f) increment = 0.01f;
+		GLuint offsetLoc = glGetUniformLocation(shaderCircleProgram, "offsetY");
+		glProgramUniform1f(shaderCircleProgram, offsetLoc, y);
+	}
+
 
 	// Circle
-
 	glBindVertexArray(VAO[0]);
 	//glDrawArrays(GL_LINE_LOOP, 0, verticesCircle.size());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, verticesCircle.size());
 	glBindVertexArray(0);
-
 
 }
 
