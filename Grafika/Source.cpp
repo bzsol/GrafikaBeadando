@@ -37,6 +37,7 @@ bool		xDir = true;
 bool		yDir = false;
 
 
+// These are the line vertices and the colors.
 float verticesLine[] = {
 	-0.33,0.0,0.0,
 	0.33,0.0,0.0
@@ -50,11 +51,13 @@ float LineColor[] = {
 std::vector<glm::vec3> verticesCircle;
 std::vector<glm::vec3> CircleColor;
 
-void DrawCircle()
+
+// Create the lines for the vertices and also the colors (with glm)
+void CreateCircleLinesandColors()
 {
 	for (int i = 0; i <= 360; i++)
 	{
-		float theta = 2.0f * 3.1415926f * float(i) / float(360);
+		float theta = (i * (atan(1) * 4) / 180);
 		float x = 0.16 * cosf(theta);
 		float y = 0.16 * sinf(theta);
 		float z = 0.0f;
@@ -66,11 +69,11 @@ void DrawCircle()
 			verticesCircle.push_back(glm::vec3(0, 0, 0));
 			CircleColor.push_back(glm::vec3(1.0, 0.0, 0.0));
 		}
-		
+
 	}
 }
 
-
+// Read the Shader file
 std::string readShaderSource(const char* filePath) {
 	string content;
 	ifstream fileStream(filePath, ios::in);
@@ -84,80 +87,201 @@ std::string readShaderSource(const char* filePath) {
 	return content;
 }
 
-static unsigned int CompileShader(const string& sourceShader, unsigned int type) {
-	unsigned int id = glCreateShader(type);
-	const char* src = &sourceShader[0];
-	glShaderSource(id, 1, &src, NULL);
-	glCompileShader(id);
 
-	// Error check
-	int result;
-	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-	if (result == GL_FALSE) {
-		int lenght;
-		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &lenght);
-		glDeleteShader(id);
-		return 0;
+bool checkOpenGLError() {
+	bool	foundError = false;
+	int		glErr = glGetError();
+
+
+	while (glErr != GL_NO_ERROR) {
+		cout << "glError: " << glErr << endl;
+
+		foundError = true;
+		glErr = glGetError();
 	}
-	return id;
+
+	return foundError;
 }
 
-static unsigned int CreateShader(const string& vertexShader, const string& fragmentShader) {
-	unsigned int program = glCreateProgram();
+void printShaderLog(unsigned int shader) {
+	int		length = 0;
+	int		charsWritten = 0;
+	char* log = nullptr;
 
-	unsigned int vertex = CompileShader(vertexShader, GL_VERTEX_SHADER);
-	unsigned int fragment = CompileShader(fragmentShader, GL_FRAGMENT_SHADER);
+	
+	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 
-	glAttachShader(program, vertex);
-	glAttachShader(program, fragment);
+	if (length > 0) {
+		log = (char*)malloc(length);
+		glGetShaderInfoLog(shader, length, &charsWritten, log);
+		cout << "Shader Info Log: " << log << endl;
+		free(log);
+	}
+}
 
-	glLinkProgram(program);
-	glValidateProgram(program);
 
-	glDeleteShader(vertex);
-	glDeleteShader(fragment);
+void printProgramLog(int prog) {
+	int		length = 0;
+	int		charsWritten = 0;
+	char* log = nullptr;
 
-	return program;
+	
+	glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &length);
+
+	if (length > 0) {
+		log = (char*)malloc(length);
+		glGetProgramInfoLog(prog, length, &charsWritten, log);
+		cout << "Program Info Log: " << log << endl;
+		free(log);
+	}
+}
+
+
+GLuint createShaderProgramforCircle() {
+	GLint		vertCompiled;
+	GLint		fragCompiled;
+	GLint		linked;
+
+	string		vertShaderStr = readShaderSource("vertexShaderCircle.glsl");
+	string		fragShaderStr = readShaderSource("fragmentShaderCircle.glsl");
+
+
+	GLuint		vShader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint		fShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+
+	const char* vertShaderSrc = vertShaderStr.c_str();
+	const char* fragShaderSrc = fragShaderStr.c_str();
+
+
+	glShaderSource(vShader, 1, &vertShaderSrc, NULL);
+	glShaderSource(fShader, 1, &fragShaderSrc, NULL);
+
+
+	glCompileShader(vShader);
+
+
+	checkOpenGLError();
+	glGetShaderiv(vShader, GL_COMPILE_STATUS, &vertCompiled);
+	if (vertCompiled != 1) {
+		cout << "Vertex compilation failed." << endl;
+		printShaderLog(vShader);
+	}
+
+	
+	glCompileShader(fShader);
+	
+
+	checkOpenGLError();
+	glGetShaderiv(fShader, GL_COMPILE_STATUS, &fragCompiled);
+	if (fragCompiled != 1) {
+		cout << "Fragment compilation failed." << endl;
+		printShaderLog(fShader);
+	}
+
+	GLuint		vfProgram = glCreateProgram();
+	
+
+	glAttachShader(vfProgram, vShader);
+	glAttachShader(vfProgram, fShader);
+
+
+	glLinkProgram(vfProgram);
+	
+
+	checkOpenGLError();
+	glGetProgramiv(vfProgram, GL_LINK_STATUS, &linked);
+	if (linked != 1) {
+		cout << "Shader linking failed." << endl;
+		printProgramLog(vfProgram);
+	}
+
+	
+
+	glDeleteShader(vShader);
+	glDeleteShader(fShader);
+
+	
+	return vfProgram;
 }
 
 
 
-/** Az alkalmazáshoz kapcsolódó elõkészítõ lépések, pl. a shader objektumok létrehozása. */
-/** The first initialization steps of the program, e.g.: creating the shader objects. */
-void init() {
+GLuint createShaderProgramforLine() {
+	GLint		vertCompiled;
+	GLint		fragCompiled;
+	GLint		linked;
+
+	string		vertShaderStr = readShaderSource("vertexShaderLine.glsl");
+	string		fragShaderStr = readShaderSource("fragmentShaderLine.glsl");
+
+
+	GLuint		vShader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint		fShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+
+	const char* vertShaderSrc = vertShaderStr.c_str();
+	const char* fragShaderSrc = fragShaderStr.c_str();
+
+
+	glShaderSource(vShader, 1, &vertShaderSrc, NULL);
+	glShaderSource(fShader, 1, &fragShaderSrc, NULL);
+
+
+	glCompileShader(vShader);
+
+
+	checkOpenGLError();
+	glGetShaderiv(vShader, GL_COMPILE_STATUS, &vertCompiled);
+	if (vertCompiled != 1) {
+		cout << "Vertex compilation failed." << endl;
+		printShaderLog(vShader);
+	}
+
+
+	glCompileShader(fShader);
+
+
+	checkOpenGLError();
+	glGetShaderiv(fShader, GL_COMPILE_STATUS, &fragCompiled);
+	if (fragCompiled != 1) {
+		cout << "Fragment compilation failed." << endl;
+		printShaderLog(fShader);
+	}
+
+	GLuint		vfProgram = glCreateProgram();
+
+
+	glAttachShader(vfProgram, vShader);
+	glAttachShader(vfProgram, fShader);
+
+
+	glLinkProgram(vfProgram);
+
+
+	checkOpenGLError();
+	glGetProgramiv(vfProgram, GL_LINK_STATUS, &linked);
+	if (linked != 1) {
+		cout << "Shader linking failed." << endl;
+		printProgramLog(vfProgram);
+	}
+
+
+
+	glDeleteShader(vShader);
+	glDeleteShader(fShader);
+
+
+	return vfProgram;
+}
+
+void init(GLFWwindow* window) {
+
+	// Circle
+	CreateCircleLinesandColors();
 
 	glGenBuffers(numVBO, VBO);
 	glGenVertexArrays(numVAO, VAO);
-
-
-	// Line
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesLine), verticesLine, GL_STATIC_DRAW);
-	glBindVertexArray(VAO[1]);
-	
-
-	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	/* Engedélyezzük az imént definiált location = 0 attribútumot (vertexShader.glsl). */
-	/* Enable the previously defined location = 0 attributum (vertexShader.glsl). */
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(LineColor), LineColor, GL_STATIC_DRAW);
-	glBindVertexArray(VAO[1]);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	/* Leválasztjuk a vertex array objektumot és a buffert is. */
-	/* Detach the vertex array object and the buffer also. */
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-	// Circle
-	DrawCircle();
-
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 
@@ -185,17 +309,36 @@ void init() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
-	string vertexShaderSourceLine = readShaderSource("vertexShaderLine.glsl");
-	string fragmentShaderSourceLine = readShaderSource("fragmentShaderLine.glsl");
+	// Line
 
-	string vertexShaderSourceCircle = readShaderSource("vertexShaderCircle.glsl");
-	string fragmentShaderSourceCircle = readShaderSource("fragmentShaderCircle.glsl");
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
 
-	shaderCircleProgram = CreateShader(vertexShaderSourceCircle,fragmentShaderSourceCircle);
-	shaderLineProgram = CreateShader(vertexShaderSourceLine, fragmentShaderSourceLine);
-	glUseProgram(shaderLineProgram);
-	glUseProgram(shaderCircleProgram);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesLine), verticesLine, GL_STATIC_DRAW);
+	glBindVertexArray(VAO[1]);
+
+
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	/* Engedélyezzük az imént definiált location = 0 attribútumot (vertexShader.glsl). */
+	/* Enable the previously defined location = 0 attributum (vertexShader.glsl). */
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(LineColor), LineColor, GL_STATIC_DRAW);
+	glBindVertexArray(VAO[1]);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	/* Leválasztjuk a vertex array objektumot és a buffert is. */
+	/* Detach the vertex array object and the buffer also. */
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	shaderCircleProgram = createShaderProgramforCircle();
+	shaderLineProgram = createShaderProgramforLine();
+
 	
+	
+
 }
 
 /** A kód, amellyel rajzolni tudunk a GLFWwindow objektumunkba. */
@@ -203,19 +346,26 @@ void init() {
 void display() {
 	/** Töröljük le a színbuffert! */
 	/** Let's clear the color buffer! */
-	glClearColor(1, 1, 0.0, 1.0);
+	glClearColor(0.7, 0.7, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	//Line 
+	glUseProgram(shaderLineProgram);
 
-
-	// Line
 	glBindVertexArray(VAO[1]);
 	glLineWidth(3);
 	glDrawArrays(GL_LINE_LOOP, 0, sizeof(verticesLine) / sizeof(verticesLine[0]));
 
 	// Leválasztom
 	glBindVertexArray(0);
-
+	
+	
+	// Circle
+	glUseProgram(shaderCircleProgram);
+	glBindVertexArray(VAO[0]);
+	//glDrawArrays(GL_LINE_LOOP, 0, verticesCircle.size());
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, verticesCircle.size());
+	
 	if (xDir) {
 		x += increment;
 		if (x > 0.84f) increment = -0.01f;
@@ -230,12 +380,6 @@ void display() {
 		GLuint offsetLoc = glGetUniformLocation(shaderCircleProgram, "offsetY");
 		glProgramUniform1f(shaderCircleProgram, offsetLoc, y);
 	}
-
-
-	// Circle
-	glBindVertexArray(VAO[0]);
-	//glDrawArrays(GL_LINE_LOOP, 0, verticesCircle.size());
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, verticesCircle.size());
 	glBindVertexArray(0);
 
 }
@@ -294,7 +438,7 @@ int main(void) {
 	glfwSwapInterval(1);
 	/** Az alkalmazáshoz kapcsolódó elõkészítõ lépések, pl. a shader objektumok létrehozása. */
 	/** The first initialization steps of the program, e.g.: creating the shader objects. */
-	init();
+	init(window);
 
 	/** A megadott window struktúra "close flag" vizsgálata. */
 	/** Checks the "close flag" of the specified window. */
