@@ -20,11 +20,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="fragmentShader.glsl">
+    <Text Include="fragmentShaderLine.glsl">
       <Filter>Source Files</Filter>
     </Text>
-    <Text Include="vertexShader.glsl">
+    <Text Include="vertexShaderLine.glsl">
       <Filter>Source Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vertexShaderCircle.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="fragmentShaderCircle.glsl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
