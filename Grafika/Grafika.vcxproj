@@ -148,11 +148,9 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="fragmentShaderLine.glsl" />
-    <Text Include="vertexShaderLine.glsl" />
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="fragmentShader.glsl" />
     <None Include="fragmentShaderCircle.glsl" />
+    <None Include="vertexShader.glsl" />
     <None Include="vertexShaderCircle.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
