@@ -34,8 +34,5 @@
     <None Include="fragmentShaderCircle.glsl">
       <Filter>Source Files</Filter>
     </None>
-    <None Include=".gitignore">
-      <Filter>Source Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

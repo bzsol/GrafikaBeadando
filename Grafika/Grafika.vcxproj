@@ -152,7 +152,6 @@
     <Text Include="vertexShaderLine.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".gitignore" />
     <None Include="fragmentShaderCircle.glsl" />
     <None Include="vertexShaderCircle.glsl" />
   </ItemGroup>
