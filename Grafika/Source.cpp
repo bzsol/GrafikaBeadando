@@ -66,9 +66,9 @@ GLdouble lastUpdate, updateFrequency = 0.01;
 
 float		x				= 0.00f;
 float		y				= 0.00f;
-float		increment		= 0.01f;
-float		incrementx = 0.01f;
-float		incrementy = 0.01f;
+float		increment		= 0.015f;
+float		incrementx = 0.015f;
+float		incrementy = 0.015f;
 
 bool		xDir			= true;
 bool		yDir			= false;
@@ -150,10 +150,10 @@ void bounce(double currentTime) {
 	{
 		y += incrementy;
 		x += incrementx;
-		if (x > 0.84f) incrementx = -0.01;
-		if (x < -0.84f) incrementx = 0.01;
-		if (y > 0.84f) incrementy = -0.01;
-		if (y < -0.84f) incrementy = 0.01;
+		if (x > 0.84f) incrementx = -0.02;
+		if (x < -0.84f) incrementx = 0.02;
+		if (y > 0.84f) incrementy = -0.02;
+		if (y < -0.84f) incrementy = 0.02;
 		GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetX");
 		glProgramUniform1f(CircleProgram, offsetLoc, x);
 
@@ -368,18 +368,18 @@ void display(GLFWwindow* window, double currentTime) {
 		if (xDir) {
 			x += increment;
 			if (x > 0.84f) {
-				increment = -0.01f;
+				increment = -0.015f;
 			}
 			if (x < -0.84f) {
-				increment = 0.01f;
+				increment = 0.015f;
 			}
 			GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetX");
 			glProgramUniform1f(CircleProgram, offsetLoc, x);
 		}
 		if (yDir) {
 			y += increment;
-			if (y > 0.84f) increment = -0.01f; // 0.84 fogja a körvonal elérni a szélét
-			if (y < -0.84f) increment = 0.01f;
+			if (y > 0.84f) increment = -0.015f; // 0.84 fogja a körvonal elérni a szélét
+			if (y < -0.84f) increment = 0.015f;
 			GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetY");
 			glProgramUniform1f(CircleProgram, offsetLoc, y);
 		}
