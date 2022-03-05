@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+ï»¿#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "glm/glm.hpp"
@@ -66,9 +66,9 @@ GLdouble lastUpdate, updateFrequency = 0.01;
 
 float		x				= 0.00f;
 float		y				= 0.00f;
-float		increment		= 0.015f;
-float		incrementx = 0.015f;
-float		incrementy = 0.015f;
+float		increment		= 0.01f;
+float		incrementx = 0.01f;
+float		incrementy = 0.01f;
 
 bool		xDir			= true;
 bool		yDir			= false;
@@ -150,10 +150,10 @@ void bounce(double currentTime) {
 	{
 		y += incrementy;
 		x += incrementx;
-		if (x > 0.84f) incrementx = -0.02;
-		if (x < -0.84f) incrementx = 0.02;
-		if (y > 0.84f) incrementy = -0.02;
-		if (y < -0.84f) incrementy = 0.02;
+		if (x > 0.84f) incrementx = -0.01;
+		if (x < -0.84f) incrementx = 0.01;
+		if (y > 0.84f) incrementy = -0.01;
+		if (y < -0.84f) incrementy = 0.01;
 		GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetX");
 		glProgramUniform1f(CircleProgram, offsetLoc, x);
 
@@ -342,7 +342,7 @@ void init(GLFWwindow* window) {
 
 void display(GLFWwindow* window, double currentTime) {
 
-	glClear(GL_COLOR_BUFFER_BIT); // fontos lehet minden egyes alkalommal törölni!
+	glClear(GL_COLOR_BUFFER_BIT); // fontos lehet minden egyes alkalommal tÃ¶rÃ¶lni!
 
 
 
@@ -350,7 +350,7 @@ void display(GLFWwindow* window, double currentTime) {
 	glUseProgram(0);
 	glUseProgram(LineProgram);
  	glBindVertexArray(VAO[1]);
-	glLineWidth(3); // vonal vastagság 3px
+	glLineWidth(3); // vonal vastagsÃ¡g 3px
 	glDrawArrays(GL_LINES, 0, 2);
 	glBindVertexArray(0);
 
@@ -368,18 +368,18 @@ void display(GLFWwindow* window, double currentTime) {
 		if (xDir) {
 			x += increment;
 			if (x > 0.84f) {
-				increment = -0.015f;
+				increment = -0.01f;
 			}
 			if (x < -0.84f) {
-				increment = 0.015f;
+				increment = 0.01f;
 			}
 			GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetX");
 			glProgramUniform1f(CircleProgram, offsetLoc, x);
 		}
 		if (yDir) {
 			y += increment;
-			if (y > 0.84f) increment = -0.015f; // 0.84 fogja a körvonal elérni a szélét
-			if (y < -0.84f) increment = 0.015f;
+			if (y > 0.84f) increment = -0.01f; // 0.84 fogja a kÃ¶rvonal elÃ©rni a szÃ©lÃ©t
+			if (y < -0.84f) increment = 0.01f;
 			GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetY");
 			glProgramUniform1f(CircleProgram, offsetLoc, y);
 		}
