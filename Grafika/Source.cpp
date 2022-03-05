@@ -30,9 +30,9 @@ void CreateCircleLinesandColors()
 {
 	for (int i = 0; i <= 360; i++)
 	{
-		GLdouble theta = (i * (atan(1) * 4) / 180);
-		GLdouble x = 0.16 * cosf(theta); // 0-1 300px 1/6 0,16 -> 50px
-		GLdouble y = 0.16 * sinf(theta); 
+		float theta = (i * (atan(1) * 4) / 180);
+		float x = 0.16 * cosf(theta); // 0-1 300px 1/6 0,16 -> 50px
+		float y = 0.16 * sinf(theta); 
 		if (i % 2 == 0) {
 			verticesCircle.push_back(glm::vec3(x, y, 0));
 			CircleColor2.push_back(glm::vec3(0.0, 0.5, 0.0));
@@ -46,7 +46,6 @@ void CreateCircleLinesandColors()
 
 	}
 }
-
 
 #define		numVBOs			3
 #define		numVAOs			2
@@ -63,14 +62,17 @@ GLuint		LineProgram;
 GLuint		CircleProgram;
 GLuint		XoffsetLocation;
 GLuint		YoffsetLocation;
-bool random = false;
+GLdouble lastUpdate, updateFrequency = 0.01;
 
 float		x				= 0.00f;
 float		y				= 0.00f;
 float		increment		= 0.01f;
+float		incrementx = 0.01f;
+float		incrementy = 0.01f;
 
 bool		xDir			= true;
 bool		yDir			= false;
+bool dvdmode = false;
 
 bool checkOpenGLError() {
 	bool	foundError	= false;
@@ -142,6 +144,25 @@ string readShaderSource(const char* filePath) {
 
 	return content;
 }
+
+void bounce(double currentTime) {
+	if (currentTime - lastUpdate >= updateFrequency)
+	{
+		y += incrementy;
+		x += incrementx;
+		if (x > 0.84f) incrementx = -0.01;
+		if (x < -0.84f) incrementx = 0.01;
+		if (y > 0.84f) incrementy = -0.01;
+		if (y < -0.84f) incrementy = 0.01;
+		GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetX");
+		glProgramUniform1f(CircleProgram, offsetLoc, x);
+
+		GLuint offsetLoc1 = glGetUniformLocation(CircleProgram, "offsetY");
+		glProgramUniform1f(CircleProgram, offsetLoc1, y);
+	}
+}
+
+
 
 GLuint createShaderProgramforLine() {
 	GLint		vertCompiled;
@@ -339,29 +360,32 @@ void display(GLFWwindow* window, double currentTime) {
 	glBindVertexArray(VAO[0]);
 	//glDrawArrays(GL_LINE_LOOP, 0, verticesCircle.size());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, verticesCircle.size());
-	if (xDir) {
-		x += increment;
-		if (x > 0.84f) {
-			increment = -0.01f;
-		}
-		if (x < -0.84f) {
-			increment = 0.01f;
-		}
-		GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetX");
-		glProgramUniform1f(CircleProgram, offsetLoc, x);
+
+	if (dvdmode) {
+		bounce(glfwGetTime());
 	}
-	if (yDir) {
-		y += increment;
-		if (y > 0.84f) increment = -0.01f; // 0.84 fogja a körvonal elérni a szélét
-		if (y < -0.84f) increment = 0.01f;
-		GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetY");
-		glProgramUniform1f(CircleProgram, offsetLoc, y);
+	else {
+		if (xDir) {
+			x += increment;
+			if (x > 0.84f) {
+				increment = -0.01f;
+			}
+			if (x < -0.84f) {
+				increment = 0.01f;
+			}
+			GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetX");
+			glProgramUniform1f(CircleProgram, offsetLoc, x);
+		}
+		if (yDir) {
+			y += increment;
+			if (y > 0.84f) increment = -0.01f; // 0.84 fogja a körvonal elérni a szélét
+			if (y < -0.84f) increment = 0.01f;
+			GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetY");
+			glProgramUniform1f(CircleProgram, offsetLoc, y);
+		}
+
 	}
 	if ((y >= -0.12 && y <= 0.12) && (x >= -0.50 && x <= 0.50)) {
-		cout << "X: ";
-		cout << x << endl;
-		cout << "Y: ";
-		cout << y << endl;
 		glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 		glBufferData(GL_ARRAY_BUFFER, CircleColor2.size() * sizeof(glm::vec3), CircleColor2.data(), GL_STATIC_DRAW);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -382,9 +406,13 @@ void display(GLFWwindow* window, double currentTime) {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-
+	cout << "X: ";
+	cout << x << endl;
+	cout << "Y: ";
+	cout << y << endl;
 	glBindVertexArray(0);
 }
+
 
 
 void cleanUpScene() {
@@ -438,11 +466,9 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		yDir = false;
 	}
 	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-		xDir = true;
-		yDir = true;
-		x = RandomFloat(-0.90f, 0.90f);
-		y = RandomFloat(-0.90f, 0.90f);
-		random = true;
+		x = RandomFloat(-0.84f,0.84f);
+		y = RandomFloat(-0.84f, 0.84f);
+		dvdmode = !dvdmode;
 	}
 
 }
