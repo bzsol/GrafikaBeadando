@@ -32,7 +32,7 @@ void CreateCircleLinesandColors()
 	{
 		float theta = (i * (atan(1) * 4) / 180);
 		float x = 0.16 * cosf(theta); // 0-1 300px 1/6 0,16 -> 50px
-		float y = 0.16 * sinf(theta); 
+		float y = 0.16 * sinf(theta);
 		if (i % 2 == 0) {
 			verticesCircle.push_back(glm::vec3(x, y, 0));
 			CircleColor2.push_back(glm::vec3(0.0, 0.5, 0.0));
@@ -52,38 +52,41 @@ void CreateCircleLinesandColors()
 GLuint		VBO[numVBOs];
 GLuint		VAO[numVAOs];
 
-int			window_width	= 600;
-int			window_height	= 600;
-char		window_title[]	= "Beadando1";
+int			window_width = 600;
+int			window_height = 600;
+char		window_title[] = "Beadando1";
 
-GLboolean	keyboard[512]	= {GL_FALSE};
-GLFWwindow	*window			= nullptr;
+GLboolean	keyboard[512] = { GL_FALSE };
+GLFWwindow* window = nullptr;
 GLuint		LineProgram;
 GLuint		CircleProgram;
 GLuint		XoffsetLocation;
 GLuint		YoffsetLocation;
 GLdouble lastUpdate, updateFrequency = 0.01;
 
-float		x				= 0.00f;
-float		y				= 0.00f;
-float		increment		= 0.01f;
+
+float		x = 0.00f;
+float		y = 0.00f;
+float		linex = 0;
+float		liney = 0;
+float		increment = 0.01f;
 float		incrementx = 0.01f;
 float		incrementy = 0.01f;
 
-bool		xDir			= true;
-bool		yDir			= false;
+bool		xDir = true;
+bool		yDir = false;
 bool dvdmode = false;
 
 bool checkOpenGLError() {
-	bool	foundError	= false;
-	int		glErr		= glGetError();
+	bool	foundError = false;
+	int		glErr = glGetError();
 
 
 	while (glErr != GL_NO_ERROR) {
 		cout << "glError: " << glErr << endl;
 
-		foundError	= true;
-		glErr		= glGetError();
+		foundError = true;
+		glErr = glGetError();
 	}
 
 
@@ -91,13 +94,13 @@ bool checkOpenGLError() {
 }
 
 void printShaderLog(GLuint shader) {
-	int		length			= 0;
-	int		charsWritten	= 0;
-	char	*log			= nullptr;
-	
-	
+	int		length = 0;
+	int		charsWritten = 0;
+	char* log = nullptr;
+
+
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-	
+
 	if (length > 0) {
 		log = (char*)malloc(length);
 
@@ -109,13 +112,13 @@ void printShaderLog(GLuint shader) {
 }
 
 void printProgramLog(int prog) {
-	int		length			= 0;
-	int		charsWritten	= 0;
-	char	*log			= nullptr;
-	
-	
+	int		length = 0;
+	int		charsWritten = 0;
+	char* log = nullptr;
+
+
 	glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &length);
-	
+
 	if (length > 0) {
 		log = (char*)malloc(length);
 
@@ -140,29 +143,10 @@ string readShaderSource(const char* filePath) {
 
 
 	fileStream.close();
-	
+
 
 	return content;
 }
-
-void bounce(double currentTime) {
-	if (currentTime - lastUpdate >= updateFrequency)
-	{
-		y += incrementy;
-		x += incrementx;
-		if (x > 0.84f) incrementx = -0.01;
-		if (x < -0.84f) incrementx = 0.01;
-		if (y > 0.84f) incrementy = -0.01;
-		if (y < -0.84f) incrementy = 0.01;
-		GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetX");
-		glProgramUniform1f(CircleProgram, offsetLoc, x);
-
-		GLuint offsetLoc1 = glGetUniformLocation(CircleProgram, "offsetY");
-		glProgramUniform1f(CircleProgram, offsetLoc1, y);
-	}
-}
-
-
 
 GLuint createShaderProgramforLine() {
 	GLint		vertCompiled;
@@ -175,8 +159,8 @@ GLuint createShaderProgramforLine() {
 	GLuint		vShader = glCreateShader(GL_VERTEX_SHADER);
 	GLuint		fShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-	const char	*vertShaderSrc = vertShaderStr.c_str();
-	const char	*fragShaderSrc = fragShaderStr.c_str();
+	const char* vertShaderSrc = vertShaderStr.c_str();
+	const char* fragShaderSrc = fragShaderStr.c_str();
 
 
 	glShaderSource(vShader, 1, &vertShaderSrc, NULL);
@@ -301,7 +285,7 @@ void init(GLFWwindow* window) {
 
 	// Circle
 	CreateCircleLinesandColors();
-	
+
 	glBindVertexArray(VAO[0]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
@@ -324,7 +308,7 @@ void init(GLFWwindow* window) {
 	glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
+
 	//Line
 
 	glBindVertexArray(VAO[1]);
@@ -349,7 +333,11 @@ void display(GLFWwindow* window, double currentTime) {
 
 	glUseProgram(0);
 	glUseProgram(LineProgram);
- 	glBindVertexArray(VAO[1]);
+	glBindVertexArray(VAO[1]);
+	GLuint offsetLoc = glGetUniformLocation(LineProgram, "offsetY");
+	glProgramUniform1f(LineProgram, offsetLoc, liney);
+	GLuint offsetLoc2 = glGetUniformLocation(LineProgram, "offsetY");
+	glProgramUniform1f(LineProgram, offsetLoc2, liney);
 	glLineWidth(3); // vonal vastagság 3px
 	glDrawArrays(GL_LINES, 0, 2);
 	glBindVertexArray(0);
@@ -358,11 +346,23 @@ void display(GLFWwindow* window, double currentTime) {
 	glUseProgram(0);
 	glUseProgram(CircleProgram);
 	glBindVertexArray(VAO[0]);
+	GLuint offsetLoc3 = glGetUniformLocation(CircleProgram, "offsetX");
+	glProgramUniform1f(CircleProgram, offsetLoc3, x);
+	GLuint offsetLoc4 = glGetUniformLocation(CircleProgram, "offsetY");
+	glProgramUniform1f(CircleProgram, offsetLoc4, y);
 	//glDrawArrays(GL_LINE_LOOP, 0, verticesCircle.size());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, verticesCircle.size());
 
 	if (dvdmode) {
-		bounce(glfwGetTime());
+		if (glfwGetTime() - lastUpdate >= updateFrequency)
+		{
+			y += incrementy;
+			x += incrementx;
+			if (x > 0.84f) incrementx = -0.01;
+			if (x < -0.84f) incrementx = 0.01;
+			if (y > 0.84f) incrementy = -0.01;
+			if (y < -0.84f) incrementy = 0.01;
+		}
 	}
 	else {
 		if (xDir) {
@@ -373,19 +373,17 @@ void display(GLFWwindow* window, double currentTime) {
 			if (x < -0.84f) {
 				increment = 0.01f;
 			}
-			GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetX");
-			glProgramUniform1f(CircleProgram, offsetLoc, x);
+
 		}
 		if (yDir) {
 			y += increment;
 			if (y > 0.84f) increment = -0.01f; // 0.84 fogja a körvonal elérni a szélét
 			if (y < -0.84f) increment = 0.01f;
-			GLuint offsetLoc = glGetUniformLocation(CircleProgram, "offsetY");
-			glProgramUniform1f(CircleProgram, offsetLoc, y);
+
 		}
 
 	}
-	if ((y >= -0.12 && y <= 0.12) && (x >= -0.50 && x <= 0.50)) {
+	if ((y >= -0.12 + liney && y <= 0.12 + liney) && (x >= -0.50 + linex && x <= 0.50 + linex)) {
 		glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 		glBufferData(GL_ARRAY_BUFFER, CircleColor2.size() * sizeof(glm::vec3), CircleColor2.data(), GL_STATIC_DRAW);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -410,6 +408,10 @@ void display(GLFWwindow* window, double currentTime) {
 	cout << x << endl;
 	cout << "Y: ";
 	cout << y << endl;
+	cout << "lineX: ";
+	cout << linex << endl;
+	cout << "lineY: ";
+	cout << liney << endl;
 	glBindVertexArray(0);
 }
 
@@ -432,10 +434,8 @@ void cleanUpScene() {
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-	window_width	= width;
-	window_height	= height;
-
-
+	window_width = width;
+	window_height = height;
 	glViewport(0, 0, width, height);
 }
 
@@ -449,7 +449,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	if ((action == GLFW_PRESS) && (key == GLFW_KEY_ESCAPE))
 		cleanUpScene();
 
-	
+
 	if (action == GLFW_PRESS)
 		keyboard[key] = GL_TRUE;
 	else if (action == GLFW_RELEASE)
@@ -457,17 +457,13 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-		xDir = false;
-		yDir = true;
+		liney += 0.1;
 	}
-	
+
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-		xDir = true;
-		yDir = false;
+		liney -= 0.1;
 	}
 	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-		x = RandomFloat(-0.84f,0.84f);
-		y = RandomFloat(-0.84f, 0.84f);
 		dvdmode = !dvdmode;
 	}
 
@@ -482,7 +478,7 @@ int main(void) {
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	
+
 	window = glfwCreateWindow(window_width, window_height, window_title, nullptr, nullptr);
 
 
@@ -494,16 +490,16 @@ int main(void) {
 	glfwSetKeyCallback(window, keyCallback);
 
 
-	
+
 	if (glewInit() != GLEW_OK)
 		exit(EXIT_FAILURE);
 
-	
+
 	glfwSwapInterval(1);
 
-	
+
 	glfwSetWindowSizeLimits(window, 600, 600, 600, 600);
-	
+
 	glfwSetWindowAspectRatio(window, 1, 1);
 
 
