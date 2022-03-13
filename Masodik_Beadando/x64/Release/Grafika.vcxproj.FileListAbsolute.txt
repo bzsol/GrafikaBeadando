@@ -1,0 +1,3 @@
+D:\Github\GrafikaBeadando\Grafika\x64\Release\Grafika.exe
+D:\Github\GrafikaBeadando\Elso_Beadando\x64\Release\Grafika.exe
+D:\Github\GrafikaBeadando\Masodik_Beadando\x64\Release\Grafika.exe
