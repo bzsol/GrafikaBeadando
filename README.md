@@ -14,3 +14,16 @@
 - Amikor a körlap mozgás közben már nincs metszésben a szakasszal, a határvonal zöld és a centrum piros árnyalata cserélődjön fel. Ez hatással lesz az interpolált belső pontokra.
   - Innen is köszönöm mégegyszer a VBO-s tippet ezt használtam fel amit az órán említett nekem.
 - S billentyű lenyomását követően a labda elkezd pattogni, hogy akció is legyen a történetben ezt gyorsítottam. 
+
+
+
+## Feladatok amiket teljesít a második beadandó:
+
+-  A program működése során felhasználja a 4 kontrollponttal megadott harmadfokú Bézier-görbe kirajzolását törött vonallal bemutató példaprogram függvényeit.
+- A program képes 4 darab kerek kontrollpont kirajzolására is képes.
+- A kontrollpontok a drag-and-drop technikával mozgathatóak. A kontrollpontok mozgásával egy időben a görbe is újrarajzolódik.
+
+## Plusz funkciók amire képes a második beadandó:
+
+- A görbét alkotó pontok mellett kirajzolható a kontrollpoligon is.
+- A görbe, a kontrollpontok és a kontrollpoligon három eltérő tetszőleges színnel jelenik meg.
