@@ -31,8 +31,8 @@ GLuint		VAO[numVAOs];
 GLuint		bezierProgram;
 
 
-int			window_width = 600;
-int			window_height = 600;
+GLint			window_width = 600;
+GLint			window_height = 600;
 char		window_title[] = "Beadando2";
 
 GLboolean	keyboard[512] = { GL_FALSE };
@@ -67,21 +67,9 @@ GLint getActivePoint(vector<glm::vec3> p, GLint size, GLfloat sens, GLfloat x, G
 
 }
 
-double blending(GLint i, GLfloat t)
+GLdouble blending(GLint i, GLfloat t)
 {
-	// Calculate the blending with a if-else case
-	if (i == 0) {
-		return ((1 - t) * (1 - t) * (1 - t));
-	}
-	else if (i == 1) {
-		return (3 * t * (1 - t) * (1 - t));
-	}
-	else if (i == 2) {
-		return (3 * t * t * (1 - t));
-	}
-	else {
-		return (t * t * t);
-	}
+	return (i == 0) ? ((1 - t) * (1 - t) * (1 - t)) : (i == 1) ? (3 * t * (1 - t) * (1 - t)) : (i == 2) ? (3 * t * t * (1 - t)) : (t * t * t);
 }
 
 void drawBezierCurve()
@@ -287,7 +275,7 @@ void display(GLFWwindow* window, double currentTime) {
 	glUseProgram(bezierProgram);
 	glBindVertexArray(VAO[0]);
 	glLineWidth(3.5);
-	glProgramUniform1f(bezierProgram, color, 0);
+	glProgramUniform1f(bezierProgram, color, 0); // Green
 	glDrawArrays(GL_LINE_STRIP, 0, drawPoints.size());
 	glBindVertexArray(0);
 	
@@ -296,12 +284,12 @@ void display(GLFWwindow* window, double currentTime) {
 
 	// Lines
 	glLineWidth(1.5);
-	glProgramUniform1f(bezierProgram, color, 1);
+	glProgramUniform1f(bezierProgram, color, 1); // Purple
 	glDrawArrays(GL_LINE_LOOP, 0, myControlPoints.size());
 
 	// Control points
 	glPointSize(15);
-	glProgramUniform1f(bezierProgram, color, 2);
+	glProgramUniform1f(bezierProgram, color, 2); // Red
 	glDrawArrays(GL_POINTS, 0, myControlPoints.size());
 	glBindVertexArray(0);
 }
@@ -330,14 +318,18 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 void updateBezier() {
 	// Draw the points again
 	drawBezierCurve();
+
 	// Write to the VBOs the data that we want / write to the vbo the new bezier curve
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, drawPoints.size() * sizeof(glm::vec3), drawPoints.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	// Also calculate the points again
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 	glBufferData(GL_ARRAY_BUFFER, myControlPoints.size() * sizeof(glm::vec3), myControlPoints.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
 }
 
 
