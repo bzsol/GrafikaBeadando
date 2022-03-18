@@ -85,9 +85,9 @@ void drawBezierCurve()
 		nextPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 		for (int i = 0; i < myControlPoints.size(); i++)
 		{
-			nextPoint.x = nextPoint.x + (blending(i, t) * myControlPoints.at(i).x);
-			nextPoint.y = nextPoint.y + (blending(i, t) * myControlPoints.at(i).y);
-			nextPoint.z = nextPoint.z + (blending(i, t) * myControlPoints.at(i).z);
+			nextPoint.x += blending(i, t) * myControlPoints[i].x;
+			nextPoint.y += blending(i, t) * myControlPoints[i].y;
+			nextPoint.z += blending(i, t) * myControlPoints[i].z;
 		}
 
 		drawPoints.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
@@ -339,11 +339,10 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 	if (isDragged >= 0)
 	{
 		// Positions
-		myControlPoints.at(isDragged).x = xPos / (window_width / 2) - 1.0f;
-		myControlPoints.at(isDragged).y = (window_height - yPos) / (window_height / 2) - 1.0f;
-		updateBezier();
+		myControlPoints[isDragged].x = xPos / (window_width / 2) - 1.0f;
+		myControlPoints[isDragged].y = (window_height - yPos) / (window_height / 2) - 1.0f;
 	}
-
+	updateBezier();
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -352,9 +351,25 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	double x, y;
 	glfwGetCursorPos(window, &x, &y);
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		
 		if ((i = getActivePoint(myControlPoints, myControlPoints.size(), 0.1f, x, window_height - y)) != -1)
 		{
 			isDragged = i;
+		}
+		else {
+			cout << "x:";
+			cout << x / (window_width / 2) - 1.0f << endl;
+			cout << "y:";
+			cout << (window_height - y) / (window_height / 2) - 1.0f << endl;
+			myControlPoints.push_back(glm::vec3(x / (window_width / 2) - 1.0f, (window_height - y) / (window_height / 2) - 1.0f,0));
+			updateBezier();
+		}
+	}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		if ((i = getActivePoint(myControlPoints, myControlPoints.size(), 0.1f, x, window_height - y)) != -1)
+		{
+			myControlPoints.erase(myControlPoints.begin() + i);
+			updateBezier();
 		}
 	}
 

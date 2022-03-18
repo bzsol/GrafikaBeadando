@@ -27,3 +27,4 @@
 
 - A görbét alkotó pontok mellett kirajzolható a kontrollpoligon is.
 - A görbe, a kontrollpontok és a kontrollpoligon három eltérő tetszőleges színnel jelenik meg.
+- A bal gombbal üres helyre kattintva hozzunk létre egy új kontrollpontot a kattintás helyén. Jobb gombbal meglévő kontrollpontra kattintva távolítsuk el azt. A fokszám módosítás után rajzoljuk újra a görbét az új kontrollpontok alapján. 
