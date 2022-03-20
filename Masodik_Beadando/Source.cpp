@@ -85,11 +85,10 @@ void drawBezierCurve()
 		nextPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 		for (int i = 0; i < myControlPoints.size(); i++)
 		{
-			nextPoint.x += blending(i, t) * myControlPoints[i].x;
-			nextPoint.y += blending(i, t) * myControlPoints[i].y;
-			nextPoint.z += blending(i, t) * myControlPoints[i].z;
+			nextPoint.x += blending(i,t) * myControlPoints[i].x;
+			nextPoint.y += blending(i,t) * myControlPoints[i].y;
+			nextPoint.z += blending(i,t) * myControlPoints[i].z;
 		}
-
 		drawPoints.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
 		t += increment;
 	}
@@ -319,14 +318,22 @@ void updateBezier() {
 	// Draw the points again
 	drawBezierCurve();
 
+	glBindVertexArray(VAO[0]);
+
 	// Write to the VBOs the data that we want / write to the vbo the new bezier curve
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, drawPoints.size() * sizeof(glm::vec3), drawPoints.data(), GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// Also calculate the points again
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 	glBufferData(GL_ARRAY_BUFFER, myControlPoints.size() * sizeof(glm::vec3), myControlPoints.data(), GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
@@ -357,10 +364,6 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 			isDragged = i;
 		}
 		else {
-			cout << "x:";
-			cout << x / (window_width / 2) - 1.0f << endl;
-			cout << "y:";
-			cout << (window_height - y) / (window_height / 2) - 1.0f << endl;
 			myControlPoints.push_back(glm::vec3(x / (window_width / 2) - 1.0f, (window_height - y) / (window_height / 2) - 1.0f,0));
 			updateBezier();
 		}
