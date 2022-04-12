@@ -38,6 +38,21 @@ char		window_title[] = "Beadando2";
 GLboolean	keyboard[512] = { GL_FALSE };
 GLFWwindow* window = nullptr;
 
+int NCR(int n, int r) {
+	if (r == 0) return 1;
+
+	if (r > n / 2) return NCR(n, n - r);
+
+	long res = 1;
+
+	for (int k = 1; k <= r; ++k) {
+		res *= n - k + 1;
+		res /= k;
+	}
+
+	return res;
+}
+
 // Calculate the distance of two points
 GLfloat dist2(glm::vec3 P1, glm::vec3 P2)
 {
@@ -69,27 +84,26 @@ GLint getActivePoint(vector<glm::vec3> p, GLint size, GLfloat sens, GLfloat x, G
 
 GLdouble blending(GLint i, GLfloat t)
 {
-	return (i == 0) ? ((1 - t) * (1 - t) * (1 - t)) : (i == 1) ? (3 * t * (1 - t) * (1 - t)) : (i == 2) ? (3 * t * t * (1 - t)) : (t * t * t);
+	return NCR(myControlPoints.size() - 1, i) * pow(t, i) * pow(1.0f - t, myControlPoints.size() - 1 - i);
 }
 
 void drawBezierCurve()
 {
-	//clearing the old curve array
 	drawPoints.clear();
-	glm::vec3 nextPoint;
-	GLfloat t = 0.0f;
-	GLfloat increment = 1.0f / 100.0f;
+	glm::vec3	nextPoint;
+	GLfloat		t = 0.0f, B;
+	GLfloat		increment = 1.0f / 100.0f; 
 
-	while (t <= 1.0f)
-	{
+	while (t <= 1.0f) {
 		nextPoint = glm::vec3(0.0f, 0.0f, 0.0f);
-		for (int i = 0; i < myControlPoints.size(); i++)
-		{
-			nextPoint.x += blending(i,t) * myControlPoints[i].x;
-			nextPoint.y += blending(i,t) * myControlPoints[i].y;
-			nextPoint.z += blending(i,t) * myControlPoints[i].z;
+		for (int i = 0; i < myControlPoints.size(); i++) {
+			B = blending(i, t);
+			nextPoint.x += B * myControlPoints.at(i).x;
+			nextPoint.y += B * myControlPoints.at(i).y;
+			nextPoint.z += B * myControlPoints.at(i).z;
 		}
-		drawPoints.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
+
+		drawPoints.push_back(nextPoint);
 		t += increment;
 	}
 }
