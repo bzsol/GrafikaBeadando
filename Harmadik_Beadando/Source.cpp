@@ -8,91 +8,181 @@
 #include <vector>
 #include <time.h>
 #include <cmath>
+#include "glm/glm.hpp"
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
 
+GLfloat cube1[] = {
+      
+	-0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f,  0.5f, -0.5f,
+	 0.5f,  0.5f, -0.5f,
+	-0.5f,  0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,
 
-GLint isDragged = -1;
+	-0.5f, -0.5f, 0.5f,
+	 0.5f, -0.5f, 0.5f, 
+	 0.5f,  0.5f, 0.5f,
+	 0.5f,  0.5f, 0.5f, 
+	-0.5f,  0.5f, 0.5f,
+	-0.5f, -0.5f, 0.5f,
 
-static vector<glm::vec3> myControlPoints =
-{
-	glm::vec3(-0.5f, -0.5f, 0.0f),
-	glm::vec3(-0.5f, 0.5f, 0.0f),
-	glm::vec3(0.5f, -0.5f, 0.0f),
-	glm::vec3(0.5f, 0.5f, 0.0f),
+	-0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,
+	-0.5f, -0.5f,  0.5f,
+	-0.5f,  0.5f,  0.5f,
+
+	 0.5f,  0.5f,  0.5f,
+	 0.5f,  0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f,  0.5f,
+	 0.5f,  0.5f,  0.5f,
+
+	-0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f,  0.5f,
+	 0.5f, -0.5f,  0.5f,
+	-0.5f, -0.5f,  0.5f,
+	-0.5f, -0.5f, -0.5f,
+
+	-0.5f, 0.5f, -0.5f,
+	 0.5f, 0.5f, -0.5f,
+	 0.5f, 0.5f,  0.5f,
+	 0.5f, 0.5f,  0.5f,
+	-0.5f, 0.5f,  0.5f,
+	-0.5f, 0.5f, -0.5f,
+
 };
 
- vector<glm::vec3> drawPoints;
+GLfloat cube2[] = {
+	-0.5f, -0.5f, 1.5f,
+	 0.5f, -0.5f, 1.5f,
+	 0.5f,  0.5f, 1.5f,
+	 0.5f,  0.5f, 1.5f,
+	-0.5f,  0.5f, 1.5f,
+	-0.5f, -0.5f, 1.5f,
 
-#define		numVBOs			2
-#define		numVAOs			2
+	-0.5f, -0.5f, 2.5f,
+	 0.5f, -0.5f, 2.5f,
+	 0.5f,  0.5f, 2.5f,
+	 0.5f,  0.5f, 2.5f,
+	-0.5f,  0.5f, 2.5f,
+	-0.5f, -0.5f, 2.5f,
+
+	-0.5f,  0.5f, 2.5f,
+	-0.5f,  0.5f, 1.5f,
+	-0.5f, -0.5f, 1.5f,
+	-0.5f, -0.5f, 1.5f,
+	-0.5f, -0.5f, 2.5f,
+	-0.5f,  0.5f, 2.5f,
+
+	 0.5f,  0.5f, 2.5f, 
+	 0.5f,  0.5f, 1.5f, 
+	 0.5f, -0.5f, 1.5f, 
+	 0.5f, -0.5f, 1.5f, 
+	 0.5f, -0.5f, 2.5f, 
+	 0.5f,  0.5f, 2.5f, 
+
+	-0.5f, -0.5f, 1.5f, 
+	 0.5f, -0.5f, 1.5f, 
+	 0.5f, -0.5f, 2.5f, 
+	 0.5f, -0.5f, 2.5f, 
+	-0.5f, -0.5f, 2.5f, 
+	-0.5f, -0.5f, 1.5f, 
+
+	-0.5f, 0.5f, 1.5f, 
+	 0.5f, 0.5f, 1.5f, 
+	 0.5f, 0.5f, 2.5f, 
+	 0.5f, 0.5f, 2.5f, 
+	-0.5f, 0.5f, 2.5f, 
+	-0.5f, 0.5f, 1.5f,
+
+};
+GLfloat cube3[] = {
+	-0.5f, -0.5f, -2.5f,
+	 0.5f, -0.5f, -2.5f,
+	 0.5f,  0.5f, -2.5f,
+	 0.5f,  0.5f, -2.5f,
+	-0.5f,  0.5f, -2.5f,
+	-0.5f, -0.5f, -2.5f,
+
+	-0.5f, -0.5f, -1.5f,
+	 0.5f, -0.5f, -1.5f,
+	 0.5f,  0.5f, -1.5f,
+	 0.5f,  0.5f, -1.5f,
+	-0.5f,  0.5f, -1.5f,
+	-0.5f, -0.5f, -1.5f,
+
+	-0.5f,  0.5f, -1.5f,
+	-0.5f,  0.5f, -2.5f,
+	-0.5f, -0.5f, -2.5f,
+	-0.5f, -0.5f, -2.5f,
+	-0.5f, -0.5f, -1.5f,
+	-0.5f,  0.5f, -1.5f,
+
+	 0.5f,  0.5f, -1.5f,
+	 0.5f,  0.5f, -2.5f,
+	 0.5f, -0.5f, -2.5f,
+	 0.5f, -0.5f, -2.5f,
+	 0.5f, -0.5f, -1.5f,
+	 0.5f,  0.5f, -1.5f,
+
+	-0.5f, -0.5f, -2.5f,
+	 0.5f, -0.5f, -2.5f,
+	 0.5f, -0.5f, -1.5f,
+	 0.5f, -0.5f, -1.5f,
+	-0.5f, -0.5f, -1.5f,
+	-0.5f, -0.5f, -2.5f,
+
+	-0.5f, 0.5f, -2.5f,
+	 0.5f, 0.5f, -2.5f,
+	 0.5f, 0.5f, -1.5f,
+	 0.5f, 0.5f, -1.5f,
+	-0.5f, 0.5f, -1.5f,
+	-0.5f, 0.5f, -2.5f
+
+};
+
+#define		numVBOs			3
+#define		numVAOs			3
 GLuint		VBO[numVBOs];
 GLuint		VAO[numVAOs];
-GLuint		bezierProgram;
+GLuint		cubeProgram;
+GLfloat		angle = 0.0;
+GLfloat		radius = 8.0; // Radius!! 8 <= radius <= 10
 
+
+glm::mat4 view;
+glm::mat4 projection;
+glm::vec3 cameraPos = glm::vec3(radius, 0.0f, 0.0f);
+glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); //  x = 0 y = 0 z = 0 position to the camera
+glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f); // UP vector 0,0,1 value added.
+glm::vec3 cameraMoving = glm::vec3(0.0, -1.0, 0.0);
+glm::vec3 cameraAscending = glm::vec3(0.0, 0.0, 1.0);
+GLdouble	currentTime, deltaTime, lastTime = 0.0f;
 
 GLint			window_width = 600;
 GLint			window_height = 600;
-char		window_title[] = "Beadando2";
+char			window_title[] = "Beadando3";
 
 GLboolean	keyboard[512] = { GL_FALSE };
 GLFWwindow* window = nullptr;
 
-// Calculate the distance of two points
-GLfloat dist2(glm::vec3 P1, glm::vec3 P2)
-{
-	GLfloat t1 = P1.x - P2.x;
-	GLfloat t2 = P1.y - P2.y;
 
-	return t1 * t1 + t2 * t2;
-}
-
-// Get the active points
-GLint getActivePoint(vector<glm::vec3> p, GLint size, GLfloat sens, GLfloat x, GLfloat y)
+// Perspective 55 as the task said
+void computeCameraMatrices()
 {
 
-	GLint i;
-	GLfloat s = sens * sens;
-
-	GLfloat xNorm = x / (window_width / 2) - 1.0f;
-	GLfloat yNorm = y / (window_height / 2) - 1.0f;
-	glm::vec3 P = glm::vec3(xNorm, yNorm, 0.0f);
-
-	for (i = 0; i < size; i++) {
-		if (dist2(p[i], P) < s) {
-			return i;
-		}
-	}
-	return -1;
-
+	view = glm::lookAt(cameraPos, cameraTarget, up);
+	projection = glm::perspective(glm::radians(55.0f), (GLfloat)window_width / (GLfloat)window_height, 0.1f, 100.0f);
 }
 
-GLdouble blending(GLint i, GLfloat t)
-{
-	return (i == 0) ? ((1 - t) * (1 - t) * (1 - t)) : (i == 1) ? (3 * t * (1 - t) * (1 - t)) : (i == 2) ? (3 * t * t * (1 - t)) : (t * t * t);
-}
-
-void drawBezierCurve()
-{
-	//clearing the old curve array
-	drawPoints.clear();
-	glm::vec3 nextPoint;
-	GLfloat t = 0.0f;
-	GLfloat increment = 1.0f / 100.0f;
-
-	while (t <= 1.0f)
-	{
-		nextPoint = glm::vec3(0.0f, 0.0f, 0.0f);
-		for (int i = 0; i < myControlPoints.size(); i++)
-		{
-			nextPoint.x += blending(i,t) * myControlPoints[i].x;
-			nextPoint.y += blending(i,t) * myControlPoints[i].y;
-			nextPoint.z += blending(i,t) * myControlPoints[i].z;
-		}
-		drawPoints.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
-		t += increment;
-	}
-}
 
 bool checkOpenGLError() {
 	bool	foundError = false;
@@ -165,7 +255,7 @@ string readShaderSource(const char* filePath) {
 	return content;
 }
 
-GLuint createShaderProgramforBezierCurve() {
+GLuint createShaderProgram() {
 	GLint		vertCompiled;
 	GLint		fragCompiled;
 	GLint		linked;
@@ -227,20 +317,17 @@ GLuint createShaderProgramforBezierCurve() {
 	return vfProgram;
 }
 
-
-
 void init(GLFWwindow* window) {
 
-	bezierProgram = createShaderProgramforBezierCurve();
+	cubeProgram = createShaderProgram();
 
 	glGenBuffers(numVBOs, VBO);
 	glGenVertexArrays(numVAOs, VAO);
 
-	drawBezierCurve();
 	glBindVertexArray(VAO[0]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, drawPoints.size() * sizeof(glm::vec3), drawPoints.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube1), cube1, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
@@ -249,48 +336,73 @@ void init(GLFWwindow* window) {
 	glBindVertexArray(VAO[1]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, myControlPoints.size() * sizeof(glm::vec3), myControlPoints.data(), GL_STATIC_DRAW);
-
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube2), cube2, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	glBindVertexArray(VAO[2]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube3), cube3, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+
 	glClearColor(0, 0, 0, 1.0);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void display(GLFWwindow* window, double currentTime) {
+	currentTime = glfwGetTime();
+	deltaTime = currentTime - lastTime;
+	lastTime = currentTime;
 
-	glClear(GL_COLOR_BUFFER_BIT); // fontos lehet minden egyes alkalommal törölni!
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(cubeProgram);
 
 
-	// Get the uniform value to determine the color
-	GLuint color = glGetUniformLocation(bezierProgram, "colorchanger");
-	
-
-
-	// Bezier Curve
+	// Cube 1
 	glUseProgram(0);
-	glUseProgram(bezierProgram);
+	glUseProgram(cubeProgram);
 	glBindVertexArray(VAO[0]);
-	glLineWidth(3.5);
-	glProgramUniform1f(bezierProgram, color, 0); // Green
-	glDrawArrays(GL_LINE_STRIP, 0, drawPoints.size());
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glDrawArrays(GL_TRIANGLES, 0, sizeof(cube1));
 	glBindVertexArray(0);
-	
 
+	//Cube 2
+	glUseProgram(0);
+	glUseProgram(cubeProgram);
 	glBindVertexArray(VAO[1]);
-
-	// Lines
-	glLineWidth(1.5);
-	glProgramUniform1f(bezierProgram, color, 1); // Purple
-	glDrawArrays(GL_LINE_LOOP, 0, myControlPoints.size());
-
-	// Control points
-	glPointSize(15);
-	glProgramUniform1f(bezierProgram, color, 2); // Red
-	glDrawArrays(GL_POINTS, 0, myControlPoints.size());
+	glTranslatef(0.0f, 0.0f, 2.0f);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glDrawArrays(GL_TRIANGLES, 0, sizeof(cube2));
 	glBindVertexArray(0);
+
+	// Cube 3
+	glUseProgram(0);
+	glUseProgram(cubeProgram);
+	glBindVertexArray(VAO[2]);
+	glTranslatef(0.0f, 0.0f, -2.0f);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glDrawArrays(GL_TRIANGLES, 0, sizeof(cube3));
+	glBindVertexArray(0);
+
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+	GLuint modelLoc = glGetUniformLocation(cubeProgram, "model");
+
+	computeCameraMatrices();
+	GLuint viewLoc = glGetUniformLocation(cubeProgram, "view");
+	GLuint projectionLoc = glGetUniformLocation(cubeProgram, "projection");
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
 
@@ -299,7 +411,7 @@ void cleanUpScene() {
 
 	glDeleteVertexArrays(numVAOs, VAO);
 	glDeleteBuffers(numVBOs, VBO);
-	glDeleteProgram(bezierProgram);
+	glDeleteProgram(cubeProgram);
 
 	glfwDestroyWindow(window);
 
@@ -314,74 +426,35 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void updateBezier() {
-	// Draw the points again
-	drawBezierCurve();
-
-	glBindVertexArray(VAO[0]);
-
-	// Write to the VBOs the data that we want / write to the vbo the new bezier curve
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, drawPoints.size() * sizeof(glm::vec3), drawPoints.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// Also calculate the points again
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, myControlPoints.size() * sizeof(glm::vec3), myControlPoints.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-}
-
-
-void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
-{
-	// If our mouse is already in dragging mode
-	if (isDragged >= 0)
-	{
-		// Positions
-		myControlPoints[isDragged].x = xPos / (window_width / 2) - 1.0f;
-		myControlPoints[isDragged].y = (window_height - yPos) / (window_height / 2) - 1.0f;
-	}
-	updateBezier();
-}
-
-void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
-{
-	GLint i;
-	double x, y;
-	glfwGetCursorPos(window, &x, &y);
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		
-		if ((i = getActivePoint(myControlPoints, myControlPoints.size(), 0.1f, x, window_height - y)) != -1)
-		{
-			isDragged = i;
-		}
-		else {
-			myControlPoints.push_back(glm::vec3(x / (window_width / 2) - 1.0f, (window_height - y) / (window_height / 2) - 1.0f,0));
-			updateBezier();
-		}
-	}
-	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-		if ((i = getActivePoint(myControlPoints, myControlPoints.size(), 0.1f, x, window_height - y)) != -1)
-		{
-			myControlPoints.erase(myControlPoints.begin() + i);
-			updateBezier();
-		}
-	}
-
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-		isDragged = -1;
-	}
-}
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
+	GLfloat cameraSpeed = 10.0f * deltaTime;
+
+	if (key == GLFW_KEY_UP && action == GLFW_REPEAT)
+	{
+		/* A kamera számára számítsuk ki az elõre mutató irányt .*/
+		cameraPos += cameraSpeed * cameraAscending;
+	}
+
+	if (key == GLFW_KEY_DOWN && action == GLFW_REPEAT)
+	{
+		cameraPos -= cameraSpeed * cameraAscending;
+	}
+
+	if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT)
+	{
+		angle -= cameraSpeed;
+		cameraPos.x = radius * cos(angle);
+		cameraPos.y = radius * sin(angle);
+	}
+
+	if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT)
+	{
+		angle += cameraSpeed;
+		cameraPos.x = radius * cos(angle);
+		cameraPos.y = radius * sin(angle);
+	}
 
 	if ((action == GLFW_PRESS) && (key == GLFW_KEY_ESCAPE))
 		cleanUpScene();
@@ -412,8 +485,6 @@ int main(void) {
 
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-	glfwSetCursorPosCallback(window, cursorPosCallback);
-	glfwSetMouseButtonCallback(window, mouseButtonCallback);
 	glfwSetKeyCallback(window, keyCallback);
 
 
@@ -424,7 +495,7 @@ int main(void) {
 	glfwSwapInterval(1);
 
 
-	glfwSetWindowSizeLimits(window, 600, 600, 600, 600);
+	glfwSetWindowSizeLimits(window, 800, 800, 800, 800);
 
 	glfwSetWindowAspectRatio(window, 1, 1);
 
