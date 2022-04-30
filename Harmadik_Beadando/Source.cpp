@@ -431,25 +431,24 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 	GLfloat cameraSpeed = 10.0f * deltaTime;
 
-	if (key == GLFW_KEY_UP && action == GLFW_REPEAT)
+	if ((keyboard[GLFW_KEY_W]) || (keyboard[GLFW_KEY_UP]))
 	{
-		/* A kamera számára számítsuk ki az elõre mutató irányt .*/
 		cameraPos += cameraSpeed * cameraAscending;
 	}
 
-	if (key == GLFW_KEY_DOWN && action == GLFW_REPEAT)
+	if ((keyboard[GLFW_KEY_S]) || (keyboard[GLFW_KEY_DOWN]))
 	{
 		cameraPos -= cameraSpeed * cameraAscending;
 	}
 
-	if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT)
+	if ((keyboard[GLFW_KEY_A]) || (keyboard[GLFW_KEY_LEFT]))
 	{
 		angle -= cameraSpeed;
 		cameraPos.x = radius * cos(angle);
 		cameraPos.y = radius * sin(angle);
 	}
 
-	if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT)
+	if ((keyboard[GLFW_KEY_D]) || (keyboard[GLFW_KEY_RIGHT]))
 	{
 		angle += cameraSpeed;
 		cameraPos.x = radius * cos(angle);
@@ -470,8 +469,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 int main(void) {
 
-	if (!glfwInit())
-		exit(EXIT_FAILURE);
+	if (!glfwInit()) exit(EXIT_FAILURE);
 
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -488,8 +486,7 @@ int main(void) {
 	glfwSetKeyCallback(window, keyCallback);
 
 
-	if (glewInit() != GLEW_OK)
-		exit(EXIT_FAILURE);
+	if (glewInit() != GLEW_OK) exit(EXIT_FAILURE);
 
 
 	glfwSwapInterval(1);
