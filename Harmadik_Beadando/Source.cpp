@@ -1,110 +1,158 @@
-﻿#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include "glm/glm.hpp"
-#include <array>
-#include <iostream>
-#include <string>
+﻿#include <array>
 #include <fstream>
-#include <vector>
-#include <time.h>
-#include <cmath>
-#include "glm/glm.hpp"
-#include <glm/gtx/string_cast.hpp>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <iostream>
+#include <math.h>
+#include <string>
+#include <vector>
 
 using namespace std;
 
 GLfloat cube1[] = {
       
-	-0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f, -0.5f,
-	 0.5f,  0.5f, -0.5f,
-	 0.5f,  0.5f, -0.5f,
-	-0.5f,  0.5f, -0.5f,
-	-0.5f, -0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,0.0f,  0.0f, -1.0f,
+	 0.5f, -0.5f, -0.5f,0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,0.0f,  0.0f, -1.0f,
+	-0.5f,  0.5f, -0.5f,0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f,0.0f,  0.0f, -1.0f,
 
-	-0.5f, -0.5f, 0.5f,
-	 0.5f, -0.5f, 0.5f, 
-	 0.5f,  0.5f, 0.5f,
-	 0.5f,  0.5f, 0.5f, 
-	-0.5f,  0.5f, 0.5f,
-	-0.5f, -0.5f, 0.5f,
+	-0.5f, -0.5f, 0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f, 0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f, 0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f, 0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f,  0.5f, 0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f, 0.5f,  0.0f,  0.0f, 1.0f, 
 
-	-0.5f,  0.5f,  0.5f,
-	-0.5f,  0.5f, -0.5f,
-	-0.5f, -0.5f, -0.5f,
-	-0.5f, -0.5f, -0.5f,
-	-0.5f, -0.5f,  0.5f,
-	-0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-	 0.5f,  0.5f,  0.5f,
-	 0.5f,  0.5f, -0.5f,
-	 0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f,  0.5f,
-	 0.5f,  0.5f,  0.5f,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f, 1.0f,  0.0f,  0.0f,
 
-	-0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f,  0.5f,
-	 0.5f, -0.5f,  0.5f,
-	-0.5f, -0.5f,  0.5f,
-	-0.5f, -0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f, 0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f, 0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f, 0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f, 0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f,  0.5f, 0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f, 0.0f, -1.0f,  0.0f,
 
-	-0.5f, 0.5f, -0.5f,
-	 0.5f, 0.5f, -0.5f,
-	 0.5f, 0.5f,  0.5f,
-	 0.5f, 0.5f,  0.5f,
-	-0.5f, 0.5f,  0.5f,
-	-0.5f, 0.5f, -0.5f,
+	-0.5f, 0.5f, -0.5f, 0.0f,  1.0f,  0.0f,
+	 0.5f, 0.5f, -0.5f, 0.0f,  1.0f,  0.0f,
+	 0.5f, 0.5f,  0.5f, 0.0f,  1.0f,  0.0f,
+	 0.5f, 0.5f,  0.5f, 0.0f,  1.0f,  0.0f,
+	-0.5f, 0.5f,  0.5f, 0.0f,  1.0f,  0.0f,
+	-0.5f, 0.5f, -0.5f, 0.0f,  1.0f,  0.0f
 
 };
 
 GLfloat cube2[] = {
-	-0.5f, -0.5f, 1.5f,
-	 0.5f, -0.5f, 1.5f,
-	 0.5f,  0.5f, 1.5f,
-	 0.5f,  0.5f, 1.5f,
-	-0.5f,  0.5f, 1.5f,
-	-0.5f, -0.5f, 1.5f,
 
-	-0.5f, -0.5f, 2.5f,
-	 0.5f, -0.5f, 2.5f,
-	 0.5f,  0.5f, 2.5f,
-	 0.5f,  0.5f, 2.5f,
-	-0.5f,  0.5f, 2.5f,
-	-0.5f, -0.5f, 2.5f,
+	-0.5f, -0.5f, 1.5f,0.0f,  0.0f, -1.0f,
+	 0.5f, -0.5f, 1.5f,0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, 1.5f,0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, 1.5f,0.0f,  0.0f, -1.0f,
+	-0.5f,  0.5f, 1.5f,0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, 1.5f,0.0f,  0.0f, -1.0f,
 
-	-0.5f,  0.5f, 2.5f,
-	-0.5f,  0.5f, 1.5f,
-	-0.5f, -0.5f, 1.5f,
-	-0.5f, -0.5f, 1.5f,
-	-0.5f, -0.5f, 2.5f,
-	-0.5f,  0.5f, 2.5f,
+	-0.5f, -0.5f,2.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f,2.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,2.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,2.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f,  0.5f,2.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,2.5f,  0.0f,  0.0f, 1.0f,
 
-	 0.5f,  0.5f, 2.5f, 
-	 0.5f,  0.5f, 1.5f, 
-	 0.5f, -0.5f, 1.5f, 
-	 0.5f, -0.5f, 1.5f, 
-	 0.5f, -0.5f, 2.5f, 
-	 0.5f,  0.5f, 2.5f, 
+	-0.5f,  0.5f, 2.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f, 1.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, 1.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, 1.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, 2.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f, 2.5f, -1.0f,  0.0f,  0.0f,
 
-	-0.5f, -0.5f, 1.5f, 
-	 0.5f, -0.5f, 1.5f, 
-	 0.5f, -0.5f, 2.5f, 
-	 0.5f, -0.5f, 2.5f, 
-	-0.5f, -0.5f, 2.5f, 
-	-0.5f, -0.5f, 1.5f, 
+	 0.5f,  0.5f, 2.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f, 1.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, 1.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, 1.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, 2.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f, 2.5f, 1.0f,  0.0f,  0.0f,
 
-	-0.5f, 0.5f, 1.5f, 
-	 0.5f, 0.5f, 1.5f, 
-	 0.5f, 0.5f, 2.5f, 
-	 0.5f, 0.5f, 2.5f, 
-	-0.5f, 0.5f, 2.5f, 
-	-0.5f, 0.5f, 1.5f,
+	-0.5f, -0.5f, 1.5f, 0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, 1.5f, 0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, 2.5f, 0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, 2.5f, 0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f, 2.5f, 0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f, 1.5f, 0.0f, -1.0f,  0.0f,
+
+	-0.5f, 0.5f, 1.5f, 0.0f,  1.0f,  0.0f,
+	 0.5f, 0.5f, 1.5f, 0.0f,  1.0f,  0.0f,
+	 0.5f, 0.5f, 2.5f, 0.0f,  1.0f,  0.0f,
+	 0.5f, 0.5f, 2.5f, 0.0f,  1.0f,  0.0f,
+	-0.5f, 0.5f, 2.5f, 0.0f,  1.0f,  0.0f,
+	-0.5f, 0.5f, 1.5f, 0.0f,  1.0f,  0.0f
 
 };
+
 GLfloat cube3[] = {
+
+	-0.5f, -0.5f, -2.5f,0.0f,  0.0f, -1.0f,
+	 0.5f, -0.5f, -2.5f,0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -2.5f,0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -2.5f,0.0f,  0.0f, -1.0f,
+	-0.5f,  0.5f, -2.5f,0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, -2.5f,0.0f,  0.0f, -1.0f,
+
+	-0.5f, -0.5f,-1.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f,-1.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,-1.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,-1.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f,  0.5f,-1.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,-1.5f,  0.0f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -1.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f, -2.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -2.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -2.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -1.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f, -1.5f, -1.0f,  0.0f,  0.0f,
+
+	 0.5f,  0.5f, -1.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f, -2.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -2.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -2.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -1.5f, 1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f, -1.5f, 1.0f,  0.0f,  0.0f,
+
+	-0.5f, -0.5f, -2.5f, 0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, -2.5f, 0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, -1.5f, 0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, -1.5f, 0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f, -1.5f, 0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f, -2.5f, 0.0f, -1.0f,  0.0f,
+
+	-0.5f, 0.5f, -2.5f, 0.0f,  1.0f,  0.0f,
+	 0.5f, 0.5f, -2.5f, 0.0f,  1.0f,  0.0f,
+	 0.5f, 0.5f, -1.5f, 0.0f,  1.0f,  0.0f,
+	 0.5f, 0.5f, -1.5f, 0.0f,  1.0f,  0.0f,
+	-0.5f, 0.5f, -1.5f, 0.0f,  1.0f,  0.0f,
+	-0.5f, 0.5f,  -2.5f, 0.0f,  1.0f,  0.0f
+
+};
+
+
+GLfloat cube33[] = {
 	-0.5f, -0.5f, -2.5f,
 	 0.5f, -0.5f, -2.5f,
 	 0.5f,  0.5f, -2.5f,
@@ -160,12 +208,16 @@ GLfloat		radius = 8.0; // Radius!! 8 <= radius <= 10
 
 glm::mat4 view;
 glm::mat4 projection;
-glm::vec3 cameraPos = glm::vec3(radius, 0.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(radius, 0.0f, 0.0f); // start pos
 glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); //  x = 0 y = 0 z = 0 position to the camera
 glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f); // UP vector 0,0,1 value added.
 glm::vec3 cameraMoving = glm::vec3(0.0, -1.0, 0.0);
 glm::vec3 cameraAscending = glm::vec3(0.0, 0.0, 1.0);
 GLdouble	currentTime, deltaTime, lastTime = 0.0f;
+glm::vec3	lightPos;
+GLuint		lightPosLoc;
+GLuint		invTMatrixLoc;
+glm::mat4	invTmatrix;
 
 GLint			window_width = 600;
 GLint			window_height = 600;
@@ -328,8 +380,10 @@ void init(GLFWwindow* window) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube1), cube1, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -337,17 +391,22 @@ void init(GLFWwindow* window) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube2), cube2, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(VAO[2]);
 
+
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube3), cube3, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -399,10 +458,16 @@ void display(GLFWwindow* window, double currentTime) {
 	computeCameraMatrices();
 	GLuint viewLoc = glGetUniformLocation(cubeProgram, "view");
 	GLuint projectionLoc = glGetUniformLocation(cubeProgram, "projection");
+	invTMatrixLoc = glGetUniformLocation(cubeProgram, "invTMatrix");
+	lightPosLoc = glGetUniformLocation(cubeProgram, "lightPos");
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	invTmatrix = glm::inverseTranspose(view * model);
+	glUniformMatrix4fv(invTMatrixLoc, 1, GL_FALSE, glm::value_ptr(invTmatrix));
+
+	glUniform3fv(lightPosLoc, 1, glm::value_ptr(lightPos));
 }
 
 
