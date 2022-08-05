@@ -44,6 +44,8 @@ kettő kockát helyezzük el úgy, hogy a fent definiált kamera képén a köz�
 látszódjanak. A három darab kocka azonos méretű és egymástól olyan messze legyen, hogy közéjük
 még éppen beférjen egy-egy kocka. A kockák színe legyen fehér.
 
-## Plusz funkciók amire képes a második beadandó:
+## Plusz funkciók amire képes a harmadik beadandó:
 
-- Nem lett plusz funkció létrehozva a projekt készítése során.
+- Definiáljunk egy tetszőleges színű diffúz fényforrást a jelenetünk számára. A fényforrás pozícióját
+tekintve egy körpályán folyamatosan mozogjon a z-tengely körül (z = 0). A kör sugara legyen 2 ∗ r.
+A kockák kirajzolása láthatóság szerint helyesen történjen
